@@ -720,6 +720,35 @@ var generateFwCommand = function(env) {
     generateOutput(componentLib, inputFile, outputFile);
 }
 
+ // addon = require("./build/Release/MicroFloCc.node");
+
+/* FIXME: create a runtime representation for both
+    1. device runtimes running remotely, behind serial/SPI/USB or Ethernet/WiFi transports
+    2- device runtime running in the same process, used for simulation/testing
+
+    ideally only the transport is different, and a high-level interface is available
+    to outside consumers. It should also be easy to wrap this interface in one or more NoFlo
+    components
+  */
+ function Runtime(comm) {
+     var self = {}
+
+     var io = undefined;
+     var network = new addon.Network(io);
+     var endpoint = new addon.GraphStreamer(network);
+     var hostcomm = comm;
+
+     hostcomm.on("data", function(buf) {
+         endpoint.parseByte(buf)
+     });
+     // TODO: create a way of communicating back
+
+     setInterval(function () { net.runTick(); }, 100);
+
+     return self;
+ }
+
+
 // Main
 if (require.main === module) {
 
